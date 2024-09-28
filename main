@@ -1,0 +1,45 @@
+#include <fstream>
+#include <string>
+#include <set>
+
+int main() {
+    std::ifstream file1("file1.txt");
+    std::ifstream file2("file2.txt");
+    std::ofstream file3("file3.txt", std::ios_base::app);
+    std::ofstream file4("file4.txt", std::ios_base::app);
+
+    std::set<std::string> set1, set2;
+    std::string line;
+
+    // Считываем строки из первого файла и добавляем их в set1
+    while (std::getline(file1, line)) {
+        set1.insert(line);
+    }
+
+    // Считываем строки из второго файла и добавляем их в set2
+    while (std::getline(file2, line)) {
+        set2.insert(line);
+    }
+
+    // Записываем уникальные строки из первого файла в file3
+    for (const auto& str : set1) {
+        if (set2.find(str) == set2.end()) {  // Проверяем, отсутствует ли строка во втором файле
+            file3 << str << std::endl;        // Записываем уникальную строку
+        }
+    }
+
+    // Записываем уникальные строки из второго файла в file4
+    for (const auto& str : set2) {
+        if (set1.find(str) == set1.end()) {  // Проверяем, отсутствует ли строка в первом файле
+            file4 << str << std::endl;        // Записываем уникальную строку
+        }
+    }
+
+    // Закрываем файлы
+    file1.close();
+    file2.close();
+    file3.close();
+    file4.close();
+
+    return 0;
+}
