@@ -1,0 +1,58 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <unordered_set>
+
+int main() {
+    std::ifstream file1("file1.txt");
+    std::ifstream file2("file2.txt");
+    std::ofstream outputFile1("unique_from_file1.txt", std::ios::app);
+    std::ofstream outputFile2("unique_from_file2.txt", std::ios::app);
+
+    if (!file1.is_open() || !file2.is_open() || !outputFile1.is_open() || !outputFile2.is_open()) {
+        std::cerr << "3rr0r. you dolbaeb" << std::endl;
+        return 1;
+    }
+
+    // Сохраним строки второго файла в unordered_set для быстрого поиска
+    std::unordered_set<std::string> linesInFile;
+    std::string line;
+
+    while (std::getline(file2, line)) {
+        linesInFile.insert(std::move(line)); // Применяем move, чтобы избежать лишнего копирования
+    }
+    file2.close(); // Закрываем второй файл для освобождения ресурсов
+
+    // Сравниваем строки из первого файла
+    while (std::getline(file1, line)) {
+        if (linesInFile.find(line) == linesInFile.end()) {
+            outputFile1 << line << std::endl; // Записываем уникальную строку
+        }
+    }
+    outputFile1.close(); // Закрываем файл 3
+
+    // Открываем файл 4 и очищаем временный список
+    linesInFile.clear();
+    file1.clear(); // Очищаем флаг конца файла
+    file1.seekg(0); // Возвращаемся к началу первого файла
+
+    while (std::getline(file1, line)) {
+        linesInFile.insert(std::move(line)); // Опять используем move
+    }
+    file1.close(); // Закрываем первый файл
+
+    // Открываем файл 2 снова для чтения
+    file2.open("file2.txt");
+    while (std::getline(file2, line)) {
+        if (linesInFile.find(line) == linesInFile.end()) {
+            outputFile2 << line << std::endl; // Записываем уникальную строку
+        }
+    }
+
+    // Закрываем файлы
+    outputFile2.close();
+    file2.close();
+
+    std::cout << "all done" << std::endl;
+    return 0;
+}
