@@ -1,0 +1,61 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <set>
+
+int main() {
+    std::ifstream file1("file1.txt");
+    std::ifstream file2("file2.txt");
+    std::ofstream outputFile1("unique_from_file1.txt", std::ios::app);
+    if (!file1.is_open() || !file2.is_open()) {
+        std::cerr << "opening error" << std::endl;
+        return 1;
+    }
+
+    // Сохраним строки второго файла в set
+    std::set<std::string> linesInFile;
+    std::string line;
+
+    while (std::getline(file2, line)) {
+        linesInFile.insert(line);
+    }
+
+    // Сравниваем строки из первого файла с множеством строк из второго файла
+    while (std::getline(file1, line)) {
+        if (linesInFile.find(line) == linesInFile.end()) {
+            outputFile1 << line << std::endl; // Записываем уникальную строку
+        }
+    }
+    
+    //закрываем файл 3, открываем файл 4, попутно чистим временный список
+    outputFile1.close();
+    linesInFile.clear();
+    std::ofstream outputFile2("unique_from_file2.txt", std::ios::app);
+    file2.clear();  // Очищаем флаг конца файла
+    file2.seekg(0); // Возвращаемся в начало второго файла
+    file1.clear();  // Очищаем флаг конца файла
+    file1.seekg(0); // Возвращаемся в начало первого файла
+	
+    while (std::getline(file1, line)) {
+        linesInFile.insert(line);
+    }
+
+    // Сравниваем строки из первого файла с множеством строк из второго файла
+    while (std::getline(file2, line)) {
+        if (linesInFile.find(line) == linesInFile.end()) {
+            outputFile2 << line << std::endl; // Записываем уникальную строку
+        }
+    }
+	
+	while (std::getline(file2, line)) {
+		std::cout << line << std::endl;
+	}
+	
+    // Закрываем файлы
+    file1.close();
+    file2.close();
+    outputFile2.close();
+
+    std::cout << "all done" << std::endl;
+    return 0;
+}
